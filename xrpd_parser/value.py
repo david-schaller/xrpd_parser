@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import re
 
+from xrpd_parser.utils import ParsingError
+
+
 class Value:
     
     def __init__(self, value_str) -> None:
@@ -9,10 +12,10 @@ class Value:
     
     
     def __str__(self) -> str:
-        fitted = 'fitted' if self.has_been_fitted else 'not fitted'
-        param = f', Param: {self.parameters}' if self.parameters else ''
+        fitted = "fitted" if self.has_been_fitted else "not fitted"
+        param = f", Param: {self.parameters}" if self.parameters else ""
         
-        return f'Value({self.value} +/- {self.error}, {fitted}{param})'
+        return f"Value({self.value} +/- {self.error}, {fitted}{param})"
     
     def __repr__(self) -> str:
         return str(self)
@@ -21,10 +24,10 @@ class Value:
         value_str = value_str.strip()
         
         match = re.match(
-            r'^(@\s+)?'                     # has been fitted?
-            r'([+-]?([0-9]*[.])?[0-9]+)'    # position
-            r'(`_(([0-9]*[.])?[0-9]+))?'    # error 
-            r'(_([\w\-\.]*))?',             # additional parameters/restrictions
+            r"^(@\s+)?"                     # has been fitted?
+            r"([+-]?([0-9]*[.])?[0-9]+)"    # position
+            r"(`_(([0-9]*[.])?[0-9]+))?"    # error 
+            r"(_([\w\-\.]*))?",             # additional parameters/restrictions
             value_str
         )
         
@@ -35,8 +38,8 @@ class Value:
             self.parameters = match.group(8)
             return
 
-        # special cases such as '=1/3; :  0.33333'
-        match = re.match(r'^=(\d+)\/([1-9]\d*);\s*:\s*(([0-9]*[.])?[0-9]+)$', value_str)
+        # special cases such as "=1/3; :  0.33333"
+        match = re.match(r"^=(\d+)\/([1-9]\d*);\s*:\s*(([0-9]*[.])?[0-9]+)$", value_str)
         
         if match:
             self.value = float(match.group(1)) / float(match.group(2))
@@ -45,4 +48,4 @@ class Value:
             self.parameters = match.group(3)
             return
         
-        raise ValueError(f'Could not parse value string {value_str}')
+        raise ParsingError(value_str, message="could not parse value")
