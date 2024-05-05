@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from typing import Any
 
 from xrpd_parser.value import Value
 
@@ -18,7 +19,7 @@ class Atom:
             f"beq {self.beq_label} {self.beq.value})"
         )
     
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         return {
             "name": self.name,
             "multiplicity": self.multiplicity,

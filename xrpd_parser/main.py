@@ -9,7 +9,7 @@ from typing import Any
 import pandas as pd
 
 from xrpd_parser.measurement import Measurement
-from xrpd_parser.structure import Structure
+from xrpd_parser.viz import plot_parameters
 
 
 def parse_file(filepath: str | Path) -> list[Measurement]:
@@ -39,31 +39,7 @@ def to_dataframes(measurements: list[Measurement]) -> tuple[pd.DataFrame, pd.Dat
                     "file_name": measurement.xy_file_path,
                     "temperature": measurement.temperature,
                     "phase_name": phase_name,
-                    **structure.to_dict(
-                        [
-                            "r_bragg",
-                            "a",
-                            "b",
-                            "c",
-                            "al",
-                            "be",
-                            "ga",
-                            "molar_mass",
-                            "cell_volume",
-                            "mass_fraction",
-                        ],
-                        params_with_error = {
-                            "a",
-                            "b", 
-                            "c",
-                            "al",
-                            "be",
-                            "ga",
-                            "molar_mass",
-                            "cell_volume",
-                            "mass_fraction",
-                        }
-                    )
+                    **structure.to_dict()
                 }
             )
         
@@ -86,8 +62,10 @@ if __name__ == "__main__":
     
     measurements = parse_file(path_example_file)
     
-    df_strutures, df_atoms = to_dataframes(measurements)
-    print(df_strutures)
+    df_structures, df_atoms = to_dataframes(measurements)
+    print(df_structures)
     
-    df_strutures.to_csv(PATH_EXAMPLES / "example_output_structures.csv", index=False)
+    df_structures.to_csv(PATH_EXAMPLES / "example_output_structures.csv", index=False)
     df_atoms.to_csv(PATH_EXAMPLES / "example_output_atoms.csv", index=False)
+    
+    plot_parameters(df_structures, save_as = PATH_EXAMPLES / "example_output_plot.pdf")

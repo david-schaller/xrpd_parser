@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from collections import deque
 from typing import Any
+from typing import Iterable
 
 import numpy as np
 
@@ -25,12 +26,25 @@ class Structure:
         "ga",
     }
     
-    REQUIRED_PARAMETERS = {
+    REQUIRED_PARAMS = {
         "r_bragg",
         "molar_mass",
         "cell_volume",
         "mass_fraction",
     }
+    
+    PARAM2HAS_ERROR = {
+        "r_bragg": False,
+        "a": True,
+        "b": True,
+        "c": True,
+        "al": True,
+        "be": True,
+        "ga": True,
+        "molar_mass": True,
+        "cell_volume": True,
+        "mass_fraction": True,
+    } 
     
     def __init__(self, line_queue: deque[str]) -> None:
         self.phase_name: str = ""
@@ -40,15 +54,17 @@ class Structure:
     
     def to_dict(
         self,
-        params: list[str],
-        params_with_error: set[str] | None = None
+        parameters: Iterable[str] | None = None,
     ) -> dict[str, float]:
         result = {}
         
-        for p in params:
+        if parameters is None:
+            parameters = self.PARAM2HAS_ERROR.keys()
+        
+        for p in parameters:
             result[p] = self.params[p].value if p in self.params else np.nan
             
-            if params_with_error and p in params_with_error:
+            if self.PARAM2HAS_ERROR.get(p):
                 result[f"{p}_err"] = self.params[p].error if p in self.params else np.nan
         
         return result
@@ -96,6 +112,6 @@ class Structure:
         if not self.phase_name:
             raise MissingInformationError("phase_name")
         
-        for p in self.REQUIRED_PARAMETERS:
+        for p in self.REQUIRED_PARAMS:
             if p not in self.params:
                 raise MissingInformationError(p)
