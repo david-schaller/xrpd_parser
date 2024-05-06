@@ -1,10 +1,9 @@
 """Parser for X-ray powder diffraction (XRPD) measurements."""
-
 from __future__ import annotations
 
+import argparse
 from collections import deque
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 
@@ -71,17 +70,33 @@ def to_dataframes(measurements: list[Measurement]) -> tuple[pd.DataFrame, pd.Dat
     
     return pd.DataFrame(data_structures), pd.DataFrame(data_atoms)
 
-
-if __name__ == "__main__":
-    PATH_EXAMPLES = Path("examples")
-    path_example_file = PATH_EXAMPLES / "Beispiel.out"
+# example call:
+# xrpd-parser -i examples/Beispiel.out -o examples/example_output
+def main() -> None:
+    """Entry point of the parser."""    
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-i",
+        "--input_file",
+        help="The input file containing the measurements.",
+        type=str,
+    )
+    parser.add_argument(
+        "-o",
+        "--output_directory",
+        help="The output directory to be created.",
+        type=str,
+    )
+    args = parser.parse_args()
     
-    measurements = parse_file(path_example_file)
+    file_path = Path(args.input_file)
+    output_directory = Path(args.output_directory)
+    output_directory.mkdir(exist_ok=True, parents=True)
     
+    measurements = parse_file(file_path)
     df_structures, df_atoms = to_dataframes(measurements)
-    print(df_structures)
     
-    df_structures.to_csv(PATH_EXAMPLES / "example_output_structures.csv", index=False)
-    df_atoms.to_csv(PATH_EXAMPLES / "example_output_atoms.csv", index=False)
+    df_structures.to_csv(output_directory / "structures.csv", index=False)
+    df_atoms.to_csv(output_directory / "atoms.csv", index=False)
     
-    plot_parameters(df_structures, save_as = PATH_EXAMPLES / "example_output_plot.pdf")
+    plot_parameters(df_structures, save_as = output_directory / "summary_plot.pdf")
