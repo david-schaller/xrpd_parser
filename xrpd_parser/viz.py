@@ -28,6 +28,17 @@ def plot_parameters(
     parameters: Sequence[str] | None = None,
     save_as: str | Path | None = None,
 ) -> None:
+    """Plot the values in a structures dataframe per phase.
+
+    Args:
+        df: A table containing structures.
+        parameters: The parameters to be plotted.
+        save_as: If provided, the plot is saved at this location.
+
+    Raises:
+        RuntimeError: If no parameters were found in the dataframe.
+        RuntimeError: If no phases were found in the dataframe.
+    """    
     if parameters is None:
         parameters = list(PARAMETERS2LABELS)
     

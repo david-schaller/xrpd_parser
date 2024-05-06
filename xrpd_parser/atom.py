@@ -1,3 +1,4 @@
+"""Module defining a class for atoms."""
 from __future__ import annotations
 
 import re
@@ -7,11 +8,22 @@ from xrpd_parser.value import Value
 
 
 class Atom:
+    """Class for atoms in measured structures."""
     
     def __init__(self, site_str: str) -> None:
+        """Constructor of the Atom class.
+
+        Args:
+            site_str: The string to be parsed.
+        """
         self._parse(site_str)
     
     def __str__(self):
+        """Return a string representation of the atom.
+
+        Returns:
+            A string representation of the atom.
+        """
         return (
             f"Atom({self.name}, mult={self.multiplicity}, "
             f"x={self.x_value.value}, y={self.y_value.value}, z={self.z_value.value}, "
@@ -20,6 +32,11 @@ class Atom:
         )
     
     def to_dict(self) -> dict[str, Any]:
+        """Return a dictionary representation of the atom.
+
+        Returns:
+            A dictionary representation of the atom.
+        """
         return {
             "name": self.name,
             "multiplicity": self.multiplicity,
@@ -45,6 +62,14 @@ class Atom:
         }
     
     def _parse(self, site_str: str) -> None:
+        """Parse an atom string (line starting with 'site') and set the attributes of the instance.
+
+        Args:
+            site_str: The string to be parsed.
+
+        Raises:
+            ParsingError: If the parsing was not successful.
+        """
         match = re.match(
             r"site\s+(\S+)\s+"
             r"num_posns\s+(\d+)\s+"

@@ -1,3 +1,4 @@
+"""Module defining a class for measurements."""
 from __future__ import annotations
 
 import re
@@ -9,8 +10,15 @@ from xrpd_parser.value import Value
 
 
 class Measurement:
+    """Class for measurements."""
     
     def __init__(self, calling_line: str, line_queue: deque[str]) -> None:
+        """Constructor of the Measurement class.
+
+        Args:
+            calling_line: The line containing the 'xdd' call.
+            line_queue: The queue of lines to be parsed.
+        """        
         self.xy_file_path, self.temperature = self._parse_xdd_call(calling_line)
         
         self.params: dict[str, Any] = {}
@@ -19,7 +27,18 @@ class Measurement:
         self._parse(line_queue)
     
     def _parse_xdd_call(self, calling_line: str) -> tuple[str, float]:
-    
+        """Parse the first line of the measurement, i.e., the starting with 'xdd'.
+
+        Args:
+            calling_line: The line containing the 'xdd' call.
+
+        Raises:
+            ValueError: If the file name could not be parsed from the line.
+            ValueError: If the temperature could not be parsed from the file name.
+
+        Returns:
+            The parsed file name and temperature.
+        """        
         match = re.match(r'xdd "(.+)"', calling_line)
         
         if not match:
@@ -40,6 +59,14 @@ class Measurement:
         return xy_file_path, temperature
     
     def _parse(self, line_queue: deque[str]) -> None:
+        """Parse the lines belonging to the measurement.
+        
+        The function parses line until a new measurement starts (as defined by indentation) or no
+        more lines are in the queue.
+
+        Args:
+            line_queue: The queue of lines to be parsed.
+        """        
         while line_queue and line_queue[0].startswith("\t"):
             line = line_queue.popleft()
             

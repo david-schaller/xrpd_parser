@@ -1,3 +1,4 @@
+"""Module defining a class for measured structures."""
 from __future__ import annotations
 
 import re
@@ -13,6 +14,7 @@ from xrpd_parser.value import Value
 
 
 class Structure:
+    """Class for measured structures."""
     
     NUMERICAL_PARAMS = {
         "r_bragg",
@@ -47,6 +49,11 @@ class Structure:
     } 
     
     def __init__(self, line_queue: deque[str]) -> None:
+        """Constructor of the Structure class.
+
+        Args:
+            line_queue: The queue of lines to be parsed.
+        """
         self.phase_name: str = ""
         self.params: dict[str, Any] = {}
         self.atoms: list[Atom] = []
@@ -56,6 +63,18 @@ class Structure:
         self,
         parameters: Iterable[str] | None = None,
     ) -> dict[str, float]:
+        """Return a dictionary representation of the structure.
+        
+        The returned dictionary returns 'np.nan' for all parameters that are not available for this
+        instance. If the parameter is known to come with a measurement error, then the dictionary
+        will also contain the column '{parameter}_err'.
+        
+        Args:
+            parameters: If this is provided, only these parameters are returned in the dictionary.
+
+        Returns:
+            A dictionary representation of the structure.
+        """
         result = {}
         
         if parameters is None:
@@ -70,6 +89,14 @@ class Structure:
         return result
         
     def _parse(self, line_queue: deque[str]) -> None:
+        """Parse the lines belonging to the structure.
+        
+        The function parses line until a new measurement starts (as defined by indentation) or no
+        more lines are in the queue.
+
+        Args:
+            line_queue: The queue of lines to be parsed.
+        """
         phase_name_regex = re.compile(r'^phase_name "(.*)"$')
         mvw_regex = re.compile(r'^MVW\((.*),(.*),(.*)\)$')
         

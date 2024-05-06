@@ -13,7 +13,14 @@ from xrpd_parser.viz import plot_parameters
 
 
 def parse_file(filepath: str | Path) -> list[Measurement]:
-    
+    """Parse a TOPAS output file.
+
+    Args:
+        filepath: Path to the file.
+
+    Returns:
+        A list of measurement objects.
+    """    
     measurements = []
     
     with open(filepath, "r") as f:
@@ -27,7 +34,16 @@ def parse_file(filepath: str | Path) -> list[Measurement]:
     return measurements
 
 def to_dataframes(measurements: list[Measurement]) -> tuple[pd.DataFrame, pd.DataFrame]:
-    
+    """Convert a list of measurements to dataframes.
+
+    Args:
+        measurements: A list of measurement objects.
+
+    Returns:
+        Two dataframes where the first contains one row per structure and the second one row per
+        atom. The columns 'measurement_id' and 'phase_name' can be used as foreign key in the atoms
+        table.
+    """    
     data_structures = []
     data_atoms = []
     
