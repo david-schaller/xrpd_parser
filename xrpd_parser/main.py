@@ -87,11 +87,17 @@ def main() -> None:
         help="The output directory to be created.",
         type=str,
     )
+    parser.add_argument(
+        "-n",
+        "--no_plot",
+        action="store_true",
+        help="If this flag is set, no plots are generated.",
+    )
     args = parser.parse_args()
     
     file_path = Path(args.input_file)
     output_directory = Path(args.output_directory)
-    output_directory.mkdir(exist_ok=True, parents=True)
+    output_directory.mkdir(exist_ok=True, parents=False)
     
     measurements = parse_file(file_path)
     df_structures, df_atoms = to_dataframes(measurements)
@@ -99,4 +105,5 @@ def main() -> None:
     df_structures.to_csv(output_directory / "structures.csv", index=False)
     df_atoms.to_csv(output_directory / "atoms.csv", index=False)
     
-    plot_parameters(df_structures, save_as = output_directory / "summary_plot.pdf")
+    if not args.no_plot:
+        plot_parameters(df_structures, save_as = output_directory / "summary_plot.pdf")
