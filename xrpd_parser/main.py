@@ -62,15 +62,15 @@ def to_dataframes(measurements: list[Measurement]) -> tuple[pd.DataFrame, pd.Dat
                 }
             )
         
-        for atom in structure.atoms:
-            data_atoms.append(
-                {
-                    "measurement_id": measurement_id,
-                    "temperature": measurement.temperature,
-                    "phase_name": phase_name,
-                    **atom.to_dict(),
-                }
-            )
+            for atom in structure.atoms:
+                data_atoms.append(
+                    {
+                        "measurement_id": measurement_id,
+                        "temperature": measurement.temperature,
+                        "phase_name": phase_name,
+                        **atom.to_dict(),
+                    }
+                )
     
     return pd.DataFrame(data_structures), pd.DataFrame(data_atoms)
 
