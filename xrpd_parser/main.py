@@ -22,8 +22,12 @@ def parse_file(filepath: str | Path) -> list[Measurement]:
     """    
     measurements = []
     
-    with open(filepath, "r") as f:
-        line_queue = deque(f.readlines())
+    try:
+        with open(filepath, "r") as f:
+            line_queue = deque(f.readlines())
+    except UnicodeDecodeError:
+        with open(filepath, "r", encoding="latin-1") as f:
+            line_queue = deque(f.readlines())
     
     while line_queue:
         line = line_queue.popleft()
