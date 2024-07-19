@@ -24,9 +24,24 @@ class MissingInformationError(Exception):
         """Constructor of the MissingInformationError.
 
         Args:
-            missing_information: Information that is missing
+            missing_information: Information that is missing.
             message: Custom error message after 'missing_information'.
         """
         self.missing_information = missing_information
         self.message = f"'{missing_information}' {message}"
+        super().__init__(self.message)
+
+
+class DuplicatedParameterError(Exception):
+    """Exception raises when a parameter has already been set."""
+    
+    def __init__(self, parameter: str, message: str = "has already been set") -> None:
+        """Constructor of the DuplicatedParameterError.
+
+        Args:
+            parameter: Name of the parameter.
+            message: Custom error message after 'parameter'.
+        """
+        self.parameter = parameter
+        self.message = f"'{parameter}' {message}"
         super().__init__(self.message)
