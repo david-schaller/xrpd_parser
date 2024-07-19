@@ -20,6 +20,7 @@ PARAMETERS2LABELS = {
     "molar_mass": "molar mass",
     "cell_volume": "cell volume [Å³]",
     "mass_fraction": "mass fraction [%]",
+    "temperature": "temperature [K]",
 }
 
 
@@ -27,6 +28,7 @@ def plot_parameters(
     df: pd.DataFrame,
     parameters: Sequence[str] | None = None,
     save_as: str | Path | None = None,
+    per_temperature: bool = True,
 ) -> None:
     """Plot the values in a structures dataframe per phase.
 
@@ -38,7 +40,12 @@ def plot_parameters(
     Raises:
         RuntimeError: If no parameters were found in the dataframe.
         RuntimeError: If no phases were found in the dataframe.
-    """    
+    """
+    if per_temperature:
+        print("Plotting parameters per temperature ...")
+    else:
+        print("Plotting parameters per measurement ...")
+
     if parameters is None:
         parameters = list(PARAMETERS2LABELS)
     
@@ -48,7 +55,7 @@ def plot_parameters(
             print(f"Skipping {parameter}, not in dataframe")
         elif df[parameter].isna().all():
             print(f"Skipping {parameter}, all NA")
-        else:
+        elif not per_temperature or parameter != "temperature":
             found_parameters.append(parameter)
     
     if not found_parameters:
@@ -60,7 +67,7 @@ def plot_parameters(
     if len(phases) == 0:
         raise RuntimeError("no phases to plot")
     
-    fig, axs = plt.subplots(
+    _, axs = plt.subplots(
         len(parameters),
         len(phases),
         figsize = (5 * len(phases), 4 * len(parameters)),
@@ -89,7 +96,7 @@ def plot_parameters(
             yerr = df_phase[param_err] if param_err in df_phase.columns else None
             
             ax.errorbar(
-                df_phase["temperature"],
+                df_phase["temperature" if per_temperature else "measurement_id"],
                 df_phase[parameter],
                 yerr=yerr,
                 color="darkslategray",
@@ -98,7 +105,7 @@ def plot_parameters(
                 capsize=3,
             )
             
-            ax.set_xlabel("temperature [K]")
+            ax.set_xlabel(PARAMETERS2LABELS["temperature"] if per_temperature else "measurement")
             if parameter in PARAMETERS2LABELS:
                 ax.set_ylabel(PARAMETERS2LABELS[parameter])
     
@@ -106,3 +113,4 @@ def plot_parameters(
     
     if save_as is not None:
         plt.savefig(save_as)
+        print(f"Saved plot at: {save_as}")

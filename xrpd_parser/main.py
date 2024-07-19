@@ -110,4 +110,13 @@ def main() -> None:
     df_atoms.to_csv(output_directory / "atoms.csv", index=False)
     
     if not args.no_plot:
-        plot_parameters(df_structures, save_as = output_directory / "summary_plot.pdf")
+        plot_parameters(
+            df_structures,
+            save_as = output_directory / "summary_plot_per_temperature.pdf",
+            per_temperature=True,
+        )
+        plot_parameters(
+            df_structures,
+            save_as = output_directory / "summary_plot_per_measurement.pdf",
+            per_temperature=False,
+        )
