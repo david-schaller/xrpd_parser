@@ -9,6 +9,10 @@ from xrpd_parser.structure import Structure
 from xrpd_parser.value import Value
 
 
+XDD_REGEX = re.compile(r'xdd "(.+)"')
+TEMPERATURE_REGEX = re.compile(r"_(\d+)-0_C\.xy$")
+
+
 class Measurement:
     """Class for measurements."""
     
@@ -39,14 +43,14 @@ class Measurement:
         Returns:
             The parsed file name and temperature.
         """        
-        match = re.match(r'xdd "(.+)"', calling_line)
+        match = XDD_REGEX.match(calling_line)
         
         if not match:
             raise ValueError(f"Could not parse .xy filename from {calling_line}")
         
         xy_file_path = match.group(1)
         
-        temperature_match = re.search(r"_(\d+)-0_C\.xy$", xy_file_path)
+        temperature_match = TEMPERATURE_REGEX.search(xy_file_path)
         if not temperature_match:
             raise ValueError(
                 f"Could not parse temperature from {xy_file_path}, expected filename to end with "

@@ -7,6 +7,17 @@ from typing import Any
 from xrpd_parser.value import Value
 
 
+ATOM_REGEX = re.compile(
+    r"site\s+(\S+)\s+"
+    r"num_posns\s+(\d+)\s+"
+    r"x\s+(.+)\s+"
+    r"y\s+(.+)\s+"
+    r"z\s+(.+)\s+"
+    r"occ\s+([\w\+\-]+)\s+(.+)\s+"
+    r"beq\s+(([\w\+\-\=]+)(; :)?\s+)?(.+)"
+)
+
+
 class Atom:
     """Class for atoms in measured structures."""
     
@@ -70,14 +81,7 @@ class Atom:
         Raises:
             ParsingError: If the parsing was not successful.
         """
-        match = re.match(
-            r"site\s+(\S+)\s+"
-            r"num_posns\s+(\d+)\s+"
-            r"x\s+(.+)\s+y\s+(.+)\s?z\s+(.+)\s+"
-            r"occ\s+([\w\+\-]+)\s+(([0-9]*[.])?[0-9]+)\s+"
-            r"beq\s+(([\w\+\-\=]+)(; :)?\s+)?(\S+)",
-            site_str
-        )
+        match = ATOM_REGEX.match(site_str)
         
         if not match:
             raise ValueError(f"Could not parse atom line {site_str}")
@@ -89,5 +93,5 @@ class Atom:
         self.z_value = Value(match.group(5))
         self.occ_label = match.group(6)
         self.occ = Value(match.group(7))
-        self.beq_label = match.group(10)
-        self.beq = Value(match.group(12))
+        self.beq_label = match.group(9)
+        self.beq = Value(match.group(11))

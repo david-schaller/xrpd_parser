@@ -6,6 +6,21 @@ import re
 from xrpd_parser.utils import ParsingError
 
 
+# example: 4.02901455e-007
+NUMERIC_REGEX = r"([+-]?([0-9]*[.])?[0-9]+(e[+-]\d+)?)"
+
+# example: @  4.02901455e-007`_6.025e-008_LIMIT_MIN_1e-015
+VALUE_REGEX = re.compile(
+    r"^(@\s+)?"                     # has been fitted?
+    + NUMERIC_REGEX +               # value
+    r"(`_" + NUMERIC_REGEX + r")?"  # error 
+    r"(_(.*))?$",                   # additional parameters/restrictions
+)
+
+# example: "=1/3; :  0.33333"
+FRACTION_REGEX = re.compile(r"^=(\d+)\/([1-9]\d*);\s*:\s*(([0-9]*[.])?[0-9]+)$")
+
+
 class Value:
     """A class for measured or fixed values and their errors."""
     
@@ -48,23 +63,17 @@ class Value:
         """
         value_str = value_str.strip()
         
-        match = re.match(
-            r"^(@\s+)?"                     # has been fitted?
-            r"([+-]?([0-9]*[.])?[0-9]+)"    # position
-            r"(`_(([0-9]*[.])?[0-9]+))?"    # error 
-            r"(_([\w\-\.]*))?",             # additional parameters/restrictions
-            value_str
-        )
+        match = VALUE_REGEX.match(value_str)
         
         if match:
             self.value = float(match.group(2))
-            self.error = float(match.group(5)) if match.group(5) else 0.0
+            self.error = float(match.group(6)) if match.group(6) else 0.0
             self.has_been_fitted = bool(match.group(1))
+            # TODO: parse the additional parameters, e.g., limits that were set
             self.parameters = match.group(8)
             return
 
-        # special cases such as "=1/3; :  0.33333"
-        match = re.match(r"^=(\d+)\/([1-9]\d*);\s*:\s*(([0-9]*[.])?[0-9]+)$", value_str)
+        match = FRACTION_REGEX.match(value_str)
         
         if match:
             self.value = float(match.group(1)) / float(match.group(2))

@@ -14,6 +14,15 @@ from xrpd_parser.utils import MissingInformationError
 from xrpd_parser.value import Value
 
 
+PHASE_NAME_REGEX = re.compile(r'^phase_name "(.*)"$')
+        
+# example: MVW( 842.082, 166.671`_0.069, 12.468`_0.290)
+MVW_REGEX = re.compile(r"^MVW\((.*),(.*),(.*)\)$")
+
+# example: Hexagonal(@  6.810339`_0.001012,@  4.149473`_0.001189)
+PARAM_WITH_PARENTHESES_REGEX = re.compile(r"^([a-zA-Z]+)\((.*)\)$")
+
+
 class Structure:
     """Class for measured structures."""
     
@@ -152,25 +161,17 @@ class Structure:
         Args:
             line_queue: The queue of lines to be parsed.
         """
-        phase_name_regex = re.compile(r'^phase_name "(.*)"$')
-        
-        # example: MVW( 842.082, 166.671`_0.069, 12.468`_0.290)
-        mvw_regex = re.compile(r"^MVW\((.*),(.*),(.*)\)$")
-        
-        # example: Hexagonal(@  6.810339`_0.001012,@  4.149473`_0.001189)
-        param_with_parentheses_regex = re.compile(r"^([a-zA-Z]+)\((.*)\)$")
-        
         while line_queue and line_queue[0].startswith("\t\t"):
             line = line_queue.popleft().strip()
             
             # phase name
-            match = phase_name_regex.match(line)
+            match = PHASE_NAME_REGEX.match(line)
             if match:
                 self.phase_name = match.group(1)
                 continue
             
             # molar mass, cell volume, mass fraction
-            match = mvw_regex.match(line)
+            match = MVW_REGEX.match(line)
             if match:
                 self._set_parameter("molar_mass", Value(match.group(1).strip()))
                 self._set_parameter("cell_volume", Value(match.group(2).strip()))
@@ -178,7 +179,7 @@ class Structure:
                 continue
             
             # parameters with values in parentheses
-            match = param_with_parentheses_regex.match(line)
+            match = PARAM_WITH_PARENTHESES_REGEX.match(line)
             if match:
                 if match.group(1) in self.CRYSTAL_SYSTEMS:
                     self._parse_crystal_system(match.group(1), match.group(2))
