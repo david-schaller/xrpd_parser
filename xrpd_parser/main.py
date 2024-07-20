@@ -112,11 +112,11 @@ def main() -> None:
     if not args.no_plot:
         plot_parameters(
             df_structures,
-            save_as = output_directory / "summary_plot_per_temperature.pdf",
-            per_temperature=True,
+            save_as = output_directory / "summary_plots_against_temperature.pdf",
+            against_temperature=True,
         )
         plot_parameters(
             df_structures,
-            save_as = output_directory / "summary_plot_per_measurement.pdf",
-            per_temperature=False,
+            save_as = output_directory / "summary_plots_against_measurement.pdf",
+            against_temperature=False,
         )

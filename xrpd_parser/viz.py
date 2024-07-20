@@ -28,7 +28,7 @@ def plot_parameters(
     df: pd.DataFrame,
     parameters: Sequence[str] | None = None,
     save_as: str | Path | None = None,
-    per_temperature: bool = True,
+    against_temperature: bool = True,
 ) -> None:
     """Plot the values in a structures dataframe per phase.
 
@@ -41,7 +41,7 @@ def plot_parameters(
         RuntimeError: If no parameters were found in the dataframe.
         RuntimeError: If no phases were found in the dataframe.
     """
-    if per_temperature:
+    if against_temperature:
         print("Plotting parameters per temperature ...")
     else:
         print("Plotting parameters per measurement ...")
@@ -55,7 +55,7 @@ def plot_parameters(
             print(f"Skipping {parameter}, not in dataframe")
         elif df[parameter].isna().all():
             print(f"Skipping {parameter}, all NA")
-        elif not per_temperature or parameter != "temperature":
+        elif not against_temperature or parameter != "temperature":
             found_parameters.append(parameter)
     
     if not found_parameters:
@@ -96,7 +96,7 @@ def plot_parameters(
             yerr = df_phase[param_err] if param_err in df_phase.columns else None
             
             ax.errorbar(
-                df_phase["temperature" if per_temperature else "measurement_id"],
+                df_phase["temperature" if against_temperature else "measurement_id"],
                 df_phase[parameter],
                 yerr=yerr,
                 color="darkslategray",
@@ -105,7 +105,9 @@ def plot_parameters(
                 capsize=3,
             )
             
-            ax.set_xlabel(PARAMETERS2LABELS["temperature"] if per_temperature else "measurement")
+            ax.set_xlabel(
+                PARAMETERS2LABELS["temperature"] if against_temperature else "measurement"
+            )
             if parameter in PARAMETERS2LABELS:
                 ax.set_ylabel(PARAMETERS2LABELS[parameter])
     
