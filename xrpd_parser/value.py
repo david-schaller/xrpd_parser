@@ -14,7 +14,7 @@ VALUE_REGEX = re.compile(
     r"^(@\s+)?"                     # has been fitted?
     + NUMERIC_REGEX +               # value
     r"(`_" + NUMERIC_REGEX + r")?"  # error 
-    r"(_(.*))?$",                   # additional parameters/restrictions
+    r"([\s_](.*))?$",               # additional parameters/restrictions
 )
 
 # example: "=1/3; :  0.33333"
